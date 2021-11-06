@@ -1,5 +1,6 @@
 const express = require("express");
 const exhbs = require("express-handlebars");
+const sessiaon = require("express-session");
 const path = require("path");
 const port = require("./config/server");
 
@@ -8,6 +9,9 @@ const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  sessiaon({ secret: "justforward", resave: false, saveUninitialized: false })
+);
 
 app.engine(".hbs", exhbs({ defaultLayout: "main", extname: ".hbs" }));
 app.set("view engine", ".hbs");

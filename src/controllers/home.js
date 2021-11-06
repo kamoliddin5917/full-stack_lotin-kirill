@@ -104,7 +104,6 @@ const translateLC = async (word) => {
     a["Z"] = "З";
     a["Ō"] = "Ў";
     a["Ğ"] = "Ғ";
-    a["Ş"] = "Ш";
     a["Ć"] = "Ч";
     a["a"] = "а";
     a["b"] = "б";
@@ -132,24 +131,71 @@ const translateLC = async (word) => {
     a["z"] = "з";
     a["ō"] = "ў";
     a["ğ"] = "ғ";
-    a["ş"] = "ш";
-    a["ć"] = "ч";
 
     for (let i = 0; i < word.length; i++) {
       if (word.hasOwnProperty) {
+        if (!a[word[i]]) {
+          result += word[i];
+        } else if (word[i] === "s" && word[i + 1] === "h") {
+          result += "ш";
+          i++;
+        } else if (word[i] === "S" && word[i + 1] === "h") {
+          result += "Ш";
+          i++;
+        } else if (word[i] === "с" && word[i + 1] === "h") {
+          result += "ч";
+          i++;
+        } else if (word[i] === "C" && word[i + 1] === "h") {
+          result += "Ч";
+          i++;
+        } else if (word[i] === "y" && word[i + 1] === "a") {
+          result += "я";
+          i++;
+        } else if (word[i] === "Y" && word[i + 1] === "a") {
+          result += "Я";
+          i++;
+        } else if (word[i] === "y" && word[i + 1] === "u") {
+          result += "ю";
+          i++;
+        } else if (word[i] === "Y" && word[i + 1] === "u") {
+          result += "Ю";
+          i++;
+        } else if (word[i] === "o" && word[i + 1] === "'") {
+          result += "ў";
+          i++;
+        } else if (word[i] === "O" && word[i + 1] === "'") {
+          result += "Ў";
+          i++;
+        } else if (word[i] === "g" && word[i + 1] === "'") {
+          result += "ғ";
+          i++;
+        } else if (word[i] === "G" && word[i + 1] === "'") {
+          result += "Ғ";
+          i++;
+        } else {
+          result += a[word[i]];
+        }
       }
     }
+    return result;
   } catch (error) {
     console.log(error);
   }
 };
 
 module.exports = {
-  GET: (_, res) => {
-    res.render("index");
+  GET: (req, res) => {
+    let original, result;
+    if (req.session.original && req.session.result) {
+      original = req.session.original;
+      result = req.session.result;
+    }
+    res.render("index", { original, result });
   },
-  POST: (req, res) => {
-    console.log(req.body);
+  POST: async (req, res) => {
+    const result = await translateLC(req.body.text);
+    req.session.original = req.body.text;
+    req.session.result = result;
     res.redirect("/");
   },
 };
